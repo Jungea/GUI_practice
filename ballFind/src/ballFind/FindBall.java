@@ -41,11 +41,16 @@ public class FindBall extends JFrame {
 	Timer moveTimer;
 	TimerTask moveTask;
 
+	Timer sleepTimer;
+	TimerTask sleepTask;
+
 	boolean endGame;
 	int[] resultXpos = new int[] { 50, 400, 750 };
 
 	int[] xpos = new int[] { 50, 400, 750 };
 	int ypos = 170;
+
+	boolean endUpDown;
 
 	void newGame() {
 		xpos = new int[] { 50, 400, 750 };
@@ -79,10 +84,10 @@ public class FindBall extends JFrame {
 				ranBall = random.nextInt(3);
 				ballPanel.add(ball);
 				ball.setBounds(ballXpos[ranBall], 450, 70, 70);
-				ball.setFont(new Font("Dialog", Font.BOLD, 30));
+				ball.setFont(new Font("Dialog", Font.BOLD, 40));
 				System.out.println(ranBall);
 
-				upDown(1);
+				upDown(1, new int[] { 0, 1, 2 });
 
 				ranCup = random.nextInt(3);
 				System.out.println(ranCup);
@@ -100,8 +105,8 @@ public class FindBall extends JFrame {
 					int bpos = Arrays.binarySearch(resultXpos, xpos[ranBall]);
 					ballPanel.add(ball);
 					ball.setBounds(ballXpos[bpos], 450, 70, 70);
-					upDown(-1);
-					result.setText(bpos + "¹ø ÄÅ");
+					upDown(-1, new int[] { 0, 1, 2 });
+					result.setText((bpos + 1) + "¹ø ÄÅ");
 				}
 			}
 		});
@@ -124,12 +129,97 @@ public class FindBall extends JFrame {
 		cup[2].setBounds(xpos[2], ypos, 200, 250);
 		cupPanel.add(cup[2]);
 
+		cup[0].addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				if (endGame) {
+
+					int bpos = Arrays.binarySearch(resultXpos, xpos[ranBall]);
+					ballPanel.add(ball);
+					ball.setBounds(ballXpos[bpos], 450, 70, 70);
+					upDown(-1, new int[] { 0 });
+
+					sleepTask = new TimerTask() {
+
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							upDown(-1, new int[] { 1, 2 });
+							result.setText((bpos + 1) + "¹ø ÄÅ");
+						}
+					};
+
+					sleepTimer(1500);
+
+				}
+			}
+		});
+
+		cup[1].addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				if (endGame) {
+					int bpos = Arrays.binarySearch(resultXpos, xpos[ranBall]);
+					ballPanel.add(ball);
+					ball.setBounds(ballXpos[bpos], 450, 70, 70);
+					upDown(-1, new int[] { 1 });
+
+					sleepTask = new TimerTask() {
+
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							upDown(-1, new int[] { 0, 2 });
+							result.setText((bpos + 1) + "¹ø ÄÅ");
+						}
+					};
+
+					sleepTimer(1500);
+				}
+			}
+		});
+		cup[2].addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				if (endGame) {
+					int bpos = Arrays.binarySearch(resultXpos, xpos[ranBall]);
+					ballPanel.add(ball);
+					ball.setBounds(ballXpos[bpos], 450, 70, 70);
+					upDown(-1, new int[] { 2 });
+
+					sleepTask = new TimerTask() {
+
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							upDown(-1, new int[] { 0, 1 });
+							result.setText((bpos + 1) + "¹ø ÄÅ");
+						}
+					};
+
+					sleepTimer(1500);
+				}
+			}
+		});
+
 		ballPanel.add(cupPanel);
 		add(ballPanel);
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 
+	}
+
+	public void sleepTimer(int i) {
+		sleepTimer = new Timer();
+
+		sleepTimer.schedule(sleepTask, i);
 	}
 
 	public void newTimer() {
@@ -164,9 +254,9 @@ public class FindBall extends JFrame {
 
 			@Override
 			public void run() {
-				xpos[c1] += (50 * i);
+				xpos[c1] += (60 * i);
 				cup[c1].setBounds(xpos[c1], ypos, 200, 250);
-				xpos[c2] -= (50 * i);
+				xpos[c2] -= (60 * i);
 				cup[c2].setBounds(xpos[c2], ypos, 200, 250);
 
 				if (Math.abs(xpos[c1] - xpos[c2]) >= distance) {
@@ -181,20 +271,19 @@ public class FindBall extends JFrame {
 			}
 		};
 
-		moveTimer.schedule(moveTask, 500, 20);
+		moveTimer.schedule(moveTask, 500, 10);
 	}
 
-	public void upDown(int d) {
+	public void upDown(int d, int[] n) {
 		moveTimer = new Timer();
 		moveTask = new TimerTask() {
 
 			@Override
 			public void run() {
 				ypos += (10 * d);
-
-				cup[0].setBounds(xpos[0], ypos, 200, 250);
-				cup[1].setBounds(xpos[1], ypos, 200, 250);
-				cup[2].setBounds(xpos[2], ypos, 200, 250);
+				for (int i = 0; i < n.length; i++) {
+					cup[n[i]].setBounds(xpos[n[i]], ypos, 200, 250);
+				}
 
 				if (d == 1) {
 					if (ypos >= 270) {
@@ -206,7 +295,7 @@ public class FindBall extends JFrame {
 				} else {
 					if (ypos <= 170) {
 						moveTimer.cancel();
-						ypos = 170;
+						ypos = 270; // ÄÅÀ» ´­·¯ Á¤´ä ¸ÂÃß±â¸¦ ÇßÀ» ¶§ ³ª¸ÓÁö ÄÅµéÀÇ À§Ä¡¸¦ À§ÇØ¼­
 					}
 				}
 
