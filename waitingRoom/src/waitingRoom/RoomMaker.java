@@ -3,7 +3,7 @@ package waitingRoom;
 /*
  * 작성자: 정은애
  * 작성일: 2019.01.05.
- * 방만들기 버튼 클릭 시 방 추가/ 제거 버튼 클릭 시 방 마지막 방 제거 
+ * 상하 버튼 구현/ Room 클래스 생성
  */
 
 import java.awt.BorderLayout;
@@ -13,15 +13,22 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class RoomMaker extends JFrame {
 
-	int i = 0;
-	List<JButton> list = new ArrayList<>();
+	int i = 0; // 임의 방번호
+	List<Room> list = new ArrayList<>(); // 방 리스트
+
+	int page = 0; // 사용자가 보고있는 방 페이지 번호
+	String inputName; // 방제목
+	JPanel roomPanel;
 
 	public RoomMaker() {
 		setSize(700, 500);
@@ -33,16 +40,26 @@ public class RoomMaker extends JFrame {
 		JPanel total = new JPanel();
 		total.setLayout(new BorderLayout());
 
-		JPanel roomPanel = new JPanel();
+		roomPanel = new JPanel();
 		roomPanel.setLayout(new GridLayout(2, 2));
 		roomPanel.setBackground(Color.cyan);
 
 		JPanel movePanel = new JPanel();
 		movePanel.setLayout(new GridLayout(2, 2));
 		JButton up = new JButton("∧");
+		up.addActionListener(e -> {
+			if (page != 0)
+				page--;
+			roomRepaint();
+		});
 		up.setBorderPainted(false);
 		up.setContentAreaFilled(false);
 		JButton down = new JButton("∨");
+		down.addActionListener(e -> {
+			if ((list.size() - 1) / 4 != page)
+				page++;
+			roomRepaint();
+		});
 		down.setBorderPainted(false);
 		down.setContentAreaFilled(false);
 		movePanel.add(up);
@@ -79,19 +96,10 @@ public class RoomMaker extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				list.add(new JButton("<html><body><p align=\"center\">" + (i++)
-						+ "번방</p><p>들어올래면 들어와라</p> <p align=\"right\">2/4</p></body></html>"));
-//				roomPanel.removeAll();
-//				for (int j = 0; j < 4; j++) {
-//					if (j < list.size())
-//						roomPanel.add(list.get(j));
-//					else
-//						roomPanel.add(new JLabel("hi"));
-//				}
+				inputName = JOptionPane.showInputDialog("방 제목을 입력하세요.");
+				list.add(new Room(i++, inputName));
 
-				roomPanel.add(list.get(i - 1));
-				roomPanel.revalidate();
-				roomPanel.repaint();
+				roomRepaint();
 				setTitle("방");
 			}
 		});
@@ -103,10 +111,9 @@ public class RoomMaker extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				roomPanel.remove(list.get(--i));
-				list.remove(i);
-				roomPanel.revalidate();
-				roomPanel.repaint();
+
+				removeRoom(2);
+				roomRepaint();
 				setTitle("제거");
 			}
 		});
@@ -120,6 +127,29 @@ public class RoomMaker extends JFrame {
 		setVisible(true);
 	}
 
+	public void roomRepaint() {
+		roomPanel.removeAll();
+		for (int j = 0; j < 4; j++) {
+			if (j + (4 * page) < list.size())
+				roomPanel.add(list.get(j + (4 * page)).getButton());
+			else
+				roomPanel.add(new JLabel(""));
+		}
+
+		roomPanel.revalidate();
+		roomPanel.repaint();
+	}
+
+	public void removeRoom(int roomNum) {
+		for (int k = 0; k < list.size(); k++) {
+			if (list.get(k).roomNum == roomNum) {
+				roomPanel.remove(list.get(k).getButton());
+				list.remove(k);
+				return;
+			}
+		}
+	}
+
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		new RoomMaker();
@@ -127,10 +157,45 @@ public class RoomMaker extends JFrame {
 
 }
 
-class room {
-	int roomNum;
-	String roomName;
-	int roomSize;
-	JButton button;
+//방 정보를 담는 클래스
+class Room {
+	int roomNum; // 방번호
+	String roomName; // 방 제목
+	int enterNum; // 들어온 인원
+	JButton button; // 버튼
+
+	public Room(int roomNum, String roomName) {
+		this.roomNum = roomNum;
+		this.roomName = roomName;
+		enterNum = 1;
+		button = new JButton("<html><body><p align=\"center\">" + roomNum + "번방</p><p>" + roomName
+				+ "</p> <p align=\"right\">" + enterNum + "/4</p></body></html>");
+	}
+
+	public void enterPlayer() { // 플레이어 입장
+		button.setText("<html><body><p align=\"center\">" + roomNum + "번방</p><p>" + roomName
+				+ "</p> <p align=\"right\">" + (++enterNum) + "/4</p></body></html>");
+	}
+
+	public JButton getButton() {
+		return button;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj instanceof Room == false)
+			return false;
+		Room r = (Room) obj;
+		return this.roomNum == r.roomNum && Objects.equals(this.roomName, r.roomName) && this.enterNum == r.enterNum
+				&& Objects.equals(this.button.getText(), r.button.getText());
+	}
+
+	@Override
+	public String toString() {
+		return "Room [roomNum=" + roomNum + ", roomName=" + roomName + ", enterNum=" + enterNum + ", button="
+				+ button.getText() + "]";
+	}
 
 }
