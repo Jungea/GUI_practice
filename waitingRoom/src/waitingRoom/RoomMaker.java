@@ -157,45 +157,54 @@ public class RoomMaker extends JFrame {
 
 }
 
-//방 정보를 담는 클래스
-class Room {
-	int roomNum; // 방번호
-	String roomName; // 방 제목
-	int enterNum; // 들어온 인원
-	JButton button; // 버튼
-
-	public Room(int roomNum, String roomName) {
-		this.roomNum = roomNum;
-		this.roomName = roomName;
-		enterNum = 1;
-		button = new JButton("<html><body><p align=\"center\">" + roomNum + "번방</p><p>" + roomName
-				+ "</p> <p align=\"right\">" + enterNum + "/4</p></body></html>");
-	}
-
-	public void enterPlayer() { // 플레이어 입장
-		button.setText("<html><body><p align=\"center\">" + roomNum + "번방</p><p>" + roomName
-				+ "</p> <p align=\"right\">" + (++enterNum) + "/4</p></body></html>");
-	}
-
-	public JButton getButton() {
-		return button;
-	}
+class roomEnterAction implements ActionListener {
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj instanceof Room == false)
-			return false;
-		Room r = (Room) obj;
-		return this.roomNum == r.roomNum && Objects.equals(this.roomName, r.roomName) && this.enterNum == r.enterNum
-				&& Objects.equals(this.button.getText(), r.button.getText());
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		System.out.println("잘 작동");
 	}
-
-	@Override
-	public String toString() {
-		return "Room [roomNum=" + roomNum + ", roomName=" + roomName + ", enterNum=" + enterNum + ", button="
-				+ button.getText() + "]";
-	}
-
 }
+
+//class Room {
+//	int roomNum; // 방번호
+//	String roomName; // 방 제목
+//	int enterNum; // 들어온 인원
+//	JButton button; // 버튼
+//
+//	public Room(int roomNum, String roomName) {
+//		this.roomNum = roomNum;
+//		this.roomName = roomName;
+//		enterNum = 1;
+//		button = new JButton("<html><body><p align=\"center\">" + roomNum + "번방</p><p>" + roomName
+//				+ "</p> <p align=\"right\">" + enterNum + "/4</p></body></html>");
+//		button.addActionListener(new roomEnterAction());
+//	}
+//
+//	public void enterPlayer() { // 플레이어 입장
+//		button.setText("<html><body><p align=\"center\">" + roomNum + "번방</p><p>" + roomName
+//				+ "</p> <p align=\"right\">" + (++enterNum) + "/4</p></body></html>");
+//	}
+//
+//	public JButton getButton() {
+//		return button;
+//	}
+//
+//	@Override
+//	public boolean equals(Object obj) {
+//		if (this == obj)
+//			return true;
+//		if (obj instanceof Room == false)
+//			return false;
+//		Room r = (Room) obj;
+//		return this.roomNum == r.roomNum && Objects.equals(this.roomName, r.roomName) && this.enterNum == r.enterNum
+//				&& Objects.equals(this.button.getText(), r.button.getText());
+//	}
+//
+//	@Override
+//	public String toString() {
+//		return "Room [roomNum=" + roomNum + ", roomName=" + roomName + ", enterNum=" + enterNum + ", button="
+//				+ button.getText() + "]";
+//	}
+//
+//}
